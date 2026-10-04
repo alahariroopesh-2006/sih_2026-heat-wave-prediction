@@ -1,0 +1,19 @@
+# Netlify configuration for HEAT-SHIELD AI
+#
+# The project root also contains NETLIFY-DEPLOY.txt with instructions for
+# the simplest path: drag the "frontend/out" folder onto https://app.netlify.com/drop.
+#
+# This file is only used if you deploy with the Netlify CLI
+# (npm i -g netlify-cli && netlify deploy --prod). It does NOT affect
+# drag-and-drop uploads, because it lives outside the uploaded folder.
+
+[build]
+  # "frontend/out" is the pre-built site produced by:
+  #   python scripts/snapshot_export.py --base http://127.0.0.1:8000/api/v1
+  #   cd frontend && NEXT_PUBLIC_DATA_SOURCE=snapshot npm run build
+  # Nothing is compiled at deploy time, so there is no build command.
+  publish = "frontend/out"
+  command = ""
+
+[build.environment]
+  NODE_VERSION = "20"

@@ -1,0 +1,91 @@
+=====================================================================
+  HEAT-SHIELD AI  --  NETLIFY DEPLOYMENT
+=====================================================================
+
+>>> DRAG THIS ONE FOLDER TO NETLIFY:                          <<<
+
+    NETLIFY-DROP
+
+Full path:
+    C:\Users\alaha\Documents\heat wave\NETLIFY-DROP
+
+(frontend/out holds the same built site and works too. NETLIFY-DROP is
+just a copy kept at the top level so it is easy to find. See "TWO
+COPIES" below if you rebuild.)
+
+>>> DO NOT DRAG ANYTHING ELSE <<<
+
+Dragging the project root, the "heat wave" folder, the "frontend"
+folder, or this project folder itself will deploy correctly -- they
+will NOT. Those contain source code and no index.html at the top level,
+so Netlify serves its "Page not found" page.
+
+The tell: open the folder you are about to drag. If you see an
+"index.html" file sitting directly inside it, it is the right one.
+
+
+STEPS
+-----
+1. Open   https://app.netlify.com/drop
+2. Drag   frontend/out   onto the drop zone
+3. Wait for the upload to finish
+4. Open the site URL Netlify shows you
+
+No build command. No GitHub. No environment variables.
+
+
+REBUILDING (only needed after changing the app)
+------------------------------------------------
+Netlify serves a pre-built folder and never compiles anything, so a
+code change needs a rebuild before re-uploading:
+
+    python scripts/snapshot_export.py --base http://127.0.0.1:8000/api/v1
+    cd frontend
+    NEXT_PUBLIC_DATA_SOURCE=snapshot npm run build
+    cd ..
+
+Then drag the drop folder again.
+
+TWO COPIES -- KEEP THEM IN SYNC
+-------------------------------
+Both "frontend/out" and "NETLIFY-DROP" are valid drop folders, but they
+are separate copies. After every rebuild, refresh NETLIFY-DROP before
+uploading, otherwise you will upload a stale version:
+
+    cd "C:\Users\alaha\Documents\heat wave"
+    rm -rf NETLIFY-DROP/_next
+    cp -r frontend/out/. NETLIFY-DROP/
+
+(Deleting only the "_next" folder avoids a Windows "resource busy" error
+when a file server still has its working directory inside NETLIFY-DROP.)
+
+(Step 1 re-captures the dashboard data. The FastAPI backend must be
+running for it -- start it with:
+    python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+)
+
+
+VERIFYING LOCALLY BEFORE YOU DRAG (optional)
+--------------------------------------------
+Serve the folder and check it in a browser:
+
+    cd frontend/out
+    python -m http.server 8080 --bind 127.0.0.1
+
+Then open http://127.0.0.1:8080/ -- this is exactly what Netlify will
+serve. Every page should work with no backend running.
+
+
+KNOWN LIMITATIONS ON THE DEPLOYED SITE
+--------------------------------------
+* The "Rebuild demo dataset" button in Administration asks for the live
+  API, so it reports an error on the hosted site. Every other page,
+  ward drill-down, and the acknowledge/approve actions work.
+* Data is frozen at the moment the snapshot was exported.
+* The Scenario Lab shows real captured baseline conditions (current risk
+  score, heat strain, temperature, humidity, wind, radiation) and applies
+  a documented linear approximation to estimate the scenario outcome --
+  it does not re-run the full physics engine.
+* Sun-adjusted heat (WBGT), how-it-feels (UTCI) and feels-like
+  temperature are only reported by the API when they cross a threshold,
+  so they show "—" for cooler cities.

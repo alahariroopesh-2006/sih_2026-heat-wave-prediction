@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+*.db
+*.sqlite3
+node_modules/
+.next/
+out/
+dist/
+coverage/
+.pytest_cache/
+ml/data/processed/*.csv
+ml/models/*.pkl
+.DS_Store
